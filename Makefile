@@ -11,6 +11,7 @@
 # -----------------------------------------------------------------------------
 # Set ONE of the following environment variables to compile for that board:
 #
+ARMINARM=1
 # ESPRUINO_1V0=1          # Espruino board rev 1.0
 # ESPRUINO_1V1=1          # Espruino board rev 1.1 and 1.2
 # ESPRUINO_1V3=1          # Espruino board rev 1.3
@@ -33,7 +34,7 @@
 # Also:
 #
 # DEBUG=1                 # add debug symbols (-g)
-# RELEASE=1               # Force release-style compile (no asserts, etc)
+RELEASE=1               # Force release-style compile (no asserts, etc)
 # SINGLETHREAD=1          # Compile single-threaded to make compilation errors easier to find
 # BOOTLOADER=1            # make the bootloader (not Espruino)
 # PROFILE=1               # Compile with gprof profiling info
@@ -54,7 +55,7 @@ DEFINES+=-DGIT_COMMIT=$(shell git log -1 --format="%H")
 USE_MATH=1
 
 ifeq ($(shell uname -m),armv6l)
-RASPBERRYPI=1 # just a guess
+#RASPBERRYPI=1 # just a guess
 endif
 
 ifeq ($(shell uname),Darwin)
@@ -89,7 +90,20 @@ BASEADDRESS=0x08000000
 # When adding stuff here, also remember build_pininfo, platform_config.h, jshardware.c
 # TODO: Load more of this out of the BOARDNAME.py files if at all possible (see next section)
 # ---------------------------------------------------------------------------------
-ifdef ESPRUINO_1V0
+ifdef ARMINARM
+USB=1
+#USE_FILESYSTEM=1
+FAMILY=STM32F1
+CHIP=STM32F103RE
+SAVE_ON_FLASH=1
+BOARD=ARMINARM
+# find ESPRUINOBOARD in targets/stm32/jshardware.c (RTC + SWD)
+DEFINES+=-DESPRUINOBOARD
+STLIB=STM32F10X_HD
+PRECOMPILED_OBJS+=$(ROOT)/targetlibs/stm32f1/lib/startup_stm32f10x_hd.o
+OPTIMIZEFLAGS+=-O3 # short on program memory
+
+else ifdef ESPRUINO_1V0
 EMBEDDED=1
 #USE_NET=1
 USE_GRAPHICS=1
